@@ -5,14 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Timer;
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class Centroid {
-    //TODO: add time?
-    private Float amplitude;
-    private Float frequency;
+@Getter
+public class AmplitudeSpectrum {
+    List<Double> coefficients;
 }
