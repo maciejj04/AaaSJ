@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Arrays;
 import java.util.List;
 
 
@@ -14,4 +15,8 @@ import java.util.List;
 @Getter
 public class AmplitudeSpectrum {
     List<Double> coefficients;
+
+    public <T extends Number> AmplitudeSpectrum(T[] coefficients) {
+        this.coefficients = (List<Double>)Arrays.asList(coefficients);
+    }
 }

@@ -13,24 +13,22 @@ import org.apache.commons.math3.transform.TransformType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import java.io.File;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
 import static com.maciejj.AaaSJ.domain.DomainUtils.*;
+import static java.util.Arrays.stream;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
-@RestController
-public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
+public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
 
     private AudioFileFormat audioFileData;
     private AudioInputStream audioStream;
@@ -41,7 +39,7 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
     @Value("${audio-repository-path}")
     private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
 
-    @RequestMapping(path = "/v1/amplitudeSpectrum")
+    @RequestMapping(path = "/v2/amplitudeSpectrum")
     public List<AmplitudeSpectrum> amplitudeSpectrum(@RequestBody AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
         // TODO: check if file is present in user session.
@@ -54,7 +52,7 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         AudioFormatValidator.validateAudioFormat(formatInfo);
         frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), 4096);
 
-        byte[] buffer = generateByteBufer(4096, sampleSizeInBytes);//TODO: for now just use power of 2 request.getWindowSize()
+        byte[] fullBuffer = generateByteBufer((int) formatInfo.getSampleRate(), sampleSizeInBytes);
 
         ExecutorService executorService = newFixedThreadPool(2);
         ListeningExecutorService listeningExecutorService = listeningDecorator(executorService);
@@ -62,17 +60,18 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         List<ListenableFuture<AmplitudeSpectrum>> executors = new LinkedList<>();
         FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);//?
 
-        BytesArrayMapper mapper = new BytesArrayMapper(sampleSizeInBytes);
 
-        while (audioStream.read(buffer) != -1) {// This is rather functional style. Consider extracting new methods and changing this to rather 'stream()/pipeline' code style.
-            double[] mappedBuffer = mapper.updateData(buffer).mapToDoubleArr();
+        int read = audioStream.read(fullBuffer);
+        assert read == -1;
 
-            executors.add(
-                    listeningExecutorService.submit(() ->
-                            new AmplitudeSpectrum(Arrays.asList(getRealAndTakeHalf(Double.class, fftObject.transform(mappedBuffer, TransformType.FORWARD))))
-                    )
-            );
-        }
+        double[] fullAudioData = new BytesArrayMapper(fullBuffer, sampleSizeInBytes).mapToDoubleArr();
+        double[][] splittedAudioData = splitDataByNElements(fullAudioData, request.getWindowSize());
+
+        stream(splittedAudioData).forEach( row -> {
+            executors.add(listeningExecutorService.submit( () ->
+                    new AmplitudeSpectrum(getRealAndTakeHalf(Double.class, fftObject.transform(row, TransformType.FORWARD)))
+            ));
+        });
 
         // TODO: currently processed audio file informations should be stored in session.
         List<AmplitudeSpectrum> centroids = Futures.allAsList(executors).get();
@@ -85,5 +84,4 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
             throw new IllegalArgumentException("Not power of 2!");
         }
     }
-
 }

@@ -1,24 +1,29 @@
 package com.maciejj.AaaSJ.infrastructure;
 
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.Timer;
 import java.util.logging.Logger;
 
-public class TimerProxy implements InvocationHandler {
+public class TimerProxy extends HandlerInterceptorAdapter {
 
-    private Object targetObject;
-    Logger logger = Logger.getLogger("Timer");
+    private final String START_TIME = "start-time";
 
-    public TimerProxy(Object targetObject) {
-        this.targetObject = targetObject;
+    //TODO: add Logger
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        request.setAttribute(START_TIME, System.nanoTime());
+        return true;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        long startTime = System.nanoTime();
-        method.invoke(targetObject, args);
-        System.out.println("Method "+method.getName()+" took: "+ (System.nanoTime()-startTime)+" nanoSec");
-
-        return new Object();
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        long startTime = (long) request.getAttribute(START_TIME);
+        System.out.println("Request on " + request.getRequestURI() +" took: "+ (System.nanoTime() - startTime)+" nanoSec");
     }
 }

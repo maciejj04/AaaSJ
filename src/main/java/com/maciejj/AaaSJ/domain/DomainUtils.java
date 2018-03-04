@@ -16,8 +16,8 @@ public class DomainUtils {
                 .toArray();
     }
 
-    public static byte[] generateByteBufer(int windowSize, int sampleSizeInBytes){ // TODO:
-        return new byte[windowSize*(sampleSizeInBytes)];
+    public static byte[] generateByteBufer(int samplesCount, int sampleSizeInBytes){ // TODO:
+        return new byte[samplesCount*(sampleSizeInBytes)];
     }
 
     public static boolean isPowerOf2(int number){
@@ -41,6 +41,17 @@ public class DomainUtils {
         }
 
         return real;
+    }
+
+    public static double[][] splitDataByNElements(double[] data, int n){
+        double[][] resultArr = new double[(int)Math.ceil(data.length/(double)n)][n];
+
+        int arrRow = 0;
+        for(int from = 0; from < data.length; from += n){
+            resultArr[arrRow++] = Arrays.copyOfRange(data, from, from + n);
+        }
+
+        return resultArr;
     }
 
     private Double[] getReal(Complex[] complexes){
