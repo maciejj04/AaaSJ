@@ -7,6 +7,7 @@ import com.maciejj.AaaSJ.commands.AmplitudeSpectrumRQ;
 import com.maciejj.AaaSJ.domain.AmplitudeSpectrum;
 import com.maciejj.AaaSJ.domain.AudioFormatValidator;
 import com.maciejj.AaaSJ.domain.BytesArrayMapper;
+import com.maciejj.AaaSJ.infrastructure.AudioResourceLoader;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
@@ -20,6 +21,7 @@ import javax.sound.sampled.AudioInputStream;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
@@ -29,6 +31,8 @@ import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
 public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
+
+    AudioResourceLoader audioResourceLoader;
 
     private AudioFileFormat audioFileData;
     private AudioInputStream audioStream;
@@ -60,9 +64,8 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
         List<ListenableFuture<AmplitudeSpectrum>> executors = new LinkedList<>();
         FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);//?
 
+        assert audioStream.read(fullBuffer) == -1;
 
-        int read = audioStream.read(fullBuffer);
-        assert read == -1;
 
         double[] fullAudioData = new BytesArrayMapper(fullBuffer, sampleSizeInBytes).mapToDoubleArr();
         double[][] splittedAudioData = splitDataByNElements(fullAudioData, request.getWindowSize());

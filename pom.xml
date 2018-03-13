@@ -49,6 +49,11 @@
 			<artifactId>commons-math3</artifactId>
 			<version>3.6.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.11.106</version>
+		</dependency>
 		<!--to be deleted matplotlib?-->
 		<dependency>
 			<groupId>com.github.sh0nk</groupId>

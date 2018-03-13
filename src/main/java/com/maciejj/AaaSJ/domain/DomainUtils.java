@@ -19,6 +19,9 @@ public class DomainUtils {
     public static byte[] generateByteBufer(int samplesCount, int sampleSizeInBytes){ // TODO:
         return new byte[samplesCount*(sampleSizeInBytes)];
     }
+    public static byte[] generateByteBufer(int bytesCount){
+        return new byte[bytesCount];
+    }
 
     public static boolean isPowerOf2(int number){
         return (number & -number) == number;
