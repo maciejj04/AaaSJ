@@ -16,13 +16,13 @@ public class TimerProxy extends HandlerInterceptorAdapter {
     //TODO: add Logger
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         request.setAttribute(START_TIME, System.nanoTime());
         return true;
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         long startTime = (long) request.getAttribute(START_TIME);
         System.out.println("Request on " + request.getRequestURI() +" took: "+ (System.nanoTime() - startTime)+" nanoSec");
     }

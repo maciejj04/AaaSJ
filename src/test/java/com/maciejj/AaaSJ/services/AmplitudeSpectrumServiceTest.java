@@ -19,7 +19,7 @@ public class AmplitudeSpectrumServiceTest {
     @Test
     @Ignore("TODO")
     public void  ampitude_spectrum_should_have_proper_length() throws Exception {
-        service.amplitudeSpectrum(new AmplitudeSpectrumRQ("simplaWhistle.wav", windowSize, windowSize/2));
+        service.amplitudeSpectrum(new AmplitudeSpectrumRQ("simpleWhistle.wav", windowSize, windowSize/2));
 
     }
 

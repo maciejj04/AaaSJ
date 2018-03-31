@@ -7,6 +7,7 @@ import com.maciejj.AaaSJ.commands.AmplitudeSpectrumRQ;
 import com.maciejj.AaaSJ.domain.AmplitudeSpectrum;
 import com.maciejj.AaaSJ.domain.AudioFormatValidator;
 import com.maciejj.AaaSJ.domain.BytesArrayMapper;
+import com.maciejj.AaaSJ.infrastructure.PerformanceResolver;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
@@ -31,6 +32,11 @@ import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
 @RestController
 public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
+    /*
+        For now service will just use as many threads to process data as many processors are available on the machine.
+        There is UI to define sufficient nr of threads it should use.
+        NOTE: this may be tricky when it comes to PaaS like deployments when there might be many pods running on same physical/virtual machine.
+     */
 
     private AudioFileFormat audioFileData;
     private AudioInputStream audioStream;
@@ -56,7 +62,7 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
 
         byte[] buffer = generateByteBufer(4096, sampleSizeInBytes);//TODO: for now just use power of 2 request.getWindowSize()
 
-        ExecutorService executorService = newFixedThreadPool(2);
+        ExecutorService executorService = newFixedThreadPool(PerformanceResolver.threadCountForThreadPool());
         ListeningExecutorService listeningExecutorService = listeningDecorator(executorService);
 
         List<ListenableFuture<AmplitudeSpectrum>> executors = new LinkedList<>();

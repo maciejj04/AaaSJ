@@ -1,10 +1,7 @@
 package com.maciejj.AaaSJ.Session;
 
 import lombok.Getter;
-import lombok.Setter;
-import org.springframework.stereotype.Component;
 
-@Component//??
 public class UserData {
 
     // TODO: These valuesShould be populated from session-service, hardcoded for now.
