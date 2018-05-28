@@ -70,7 +70,7 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
 
         BytesArrayMapper mapper = new BytesArrayMapper(sampleSizeInBytes);
 
-        while (audioStream.read(buffer) != -1) {// This is rather functional style. Consider extracting new methods and changing this to rather 'stream()/pipeline' code style.
+        while (audioStream.read(buffer) != -1) {// This is not functional style. Consider extracting new methods and changing this to rather 'stream()/pipeline' code style.
             double[] mappedBuffer = mapper.updateData(buffer).mapToDoubleArr();
 
             executors.add(

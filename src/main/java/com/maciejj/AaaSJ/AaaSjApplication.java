@@ -34,7 +34,7 @@ public class AaaSjApplication implements WebMvcConfigurer {
 	}
 
 	@Bean
-	@Profile("prod")	//TODO: aws_access_key etc. should be retrived from user-service.(Revisit using other AWS media service for that!)
+	//TODO: aws_access_key etc. should be retrived from user-service.(Revisit using other AWS media service for that!)
 	AmazonS3ClientBuilder s3Client(@Value("${aaasj_s3_aws_access_key_id}") String s3AccessKey,
 								   @Value("${aaasj_s3_aws_secret_access_key}") String s3SecretKey) {
 		return AmazonS3ClientBuilder.standard()

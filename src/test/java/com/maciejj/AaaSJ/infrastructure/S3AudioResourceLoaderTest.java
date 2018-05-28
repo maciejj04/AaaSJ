@@ -2,7 +2,7 @@ package com.maciejj.AaaSJ.infrastructure;
 
 import com.maciejj.AaaSJ.Session.UserData;
 import com.maciejj.AaaSJ.Utils.TestUtils;
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.annotation.PostConstruct;
 import java.io.File;
 
+import static com.maciejj.AaaSJ.Utils.TestUtils.testAudioResource;
 import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
@@ -22,18 +23,19 @@ import static org.junit.Assert.*;
 public class S3AudioResourceLoaderTest {
 
     @Autowired
-    S3AudioResourceLoaderFactory s3ServiceFactory;
+    private S3AudioResourceLoaderFactory s3ServiceFactory;
 
     @Value("${audio-repository-path}")
-    String audioRepositoryPath;
+    private String audioRepositoryPath;
 
-    S3AudioResourceLoader s3Service;
-    UserData userData = TestUtils.mockUserData();
-    String resourceFileName = TestUtils.testAudioResource();
+    private S3AudioResourceLoader s3Service;
+    private UserData userData = TestUtils.mockUserData();
+    private static String resourceFileName = testAudioResource();
 
-    @AfterClass
-    public static void cleanup(){
-        // TODO: delete all downloaded files
+    @After
+    public void cleanup(){
+        boolean wasDeleted = new File(audioRepositoryPath + userData.getUsersNickname() + "/" + resourceFileName).delete();
+        assertTrue(wasDeleted);
     }
 
     @PostConstruct
@@ -51,7 +53,7 @@ public class S3AudioResourceLoaderTest {
     }
 
     private boolean fileExists(String filename){
-        File file = new File(audioRepositoryPath + userData.getUserNickname() + "/" + filename);
+        File file = new File(audioRepositoryPath + userData.getUsersNickname() + "/" + filename);
         return file.exists();
     }
 

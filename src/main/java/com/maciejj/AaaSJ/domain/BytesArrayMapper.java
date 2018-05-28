@@ -17,8 +17,6 @@ public class BytesArrayMapper {
     }
 
     public BytesArrayMapper(int bytesPerOutputSample) throws UnsupportedAudioFileException {
-        this.bytesPerOutputSample = bytesPerOutputSample;
-
         switch (bytesPerOutputSample){
             case 2:
                 supplier = () -> (double) bb.getShort(); // TODO: this is error prone! Take type as constr. parameter and cast to that type
@@ -26,6 +24,8 @@ public class BytesArrayMapper {
             default:
                 throw new UnsupportedAudioFileException();
         }
+
+        this.bytesPerOutputSample = bytesPerOutputSample;
     }
 
     //TODO: make this generic.

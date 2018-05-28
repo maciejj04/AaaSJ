@@ -7,7 +7,8 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.maciejj.AaaSJ.Session.UserData;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,7 +19,7 @@ import static com.maciejj.AaaSJ.domain.DomainUtils.generateByteBufer;
 
 public class S3AudioResourceLoader implements AudioResourceLoader {
 
-    private Logger logger = Logger.getLogger(S3AudioResourceLoader.class);
+    private Logger logger = LoggerFactory.getLogger(S3AudioResourceLoader.class.getSimpleName());
     private AmazonS3 s3Client;
     private UserData userData;
     private String audioRepositoryPath;
@@ -32,7 +33,7 @@ public class S3AudioResourceLoader implements AudioResourceLoader {
     @Override
     public void get(String resourceName) {
 
-        String fullResourcePath = audioRepositoryPath + userData.getUserNickname() + "/simpleWhistle.wav";
+        String fullResourcePath = audioRepositoryPath + userData.getUsersNickname() + "/simpleWhistle.wav";
         logger.info("Downloading \""+resourceName + "\" file from s3.");
         File file = new File(fullResourcePath);
 

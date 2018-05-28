@@ -14,6 +14,7 @@ import org.apache.commons.math3.transform.TransformType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -30,6 +31,7 @@ import static java.util.Arrays.stream;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
+@RestController
 public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
 
     AudioResourceLoader audioResourceLoader;
@@ -43,6 +45,7 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
     @Value("${audio-repository-path}")
     private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
 
+    //TODO: this is not yet working properly (test)!
     @RequestMapping(path = "/v2/amplitudeSpectrum")
     public List<AmplitudeSpectrum> amplitudeSpectrum(@RequestBody AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);

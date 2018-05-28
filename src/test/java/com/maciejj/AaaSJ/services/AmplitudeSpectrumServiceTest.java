@@ -13,14 +13,24 @@ import static org.junit.Assert.assertEquals;
 
 public class AmplitudeSpectrumServiceTest {
 
-    AmplitudeSpectrumService service = new AmplitudeSpectrumService();
-    int windowSize = 4096;
+    private AmplitudeSpectrumService service = new AmplitudeSpectrumService();
 
     @Test
     @Ignore("TODO")
-    public void  ampitude_spectrum_should_have_proper_length() throws Exception {
+    public void ampitude_spectrum_should_have_proper_length() throws Exception {
+        int windowSize = 4096;
         service.amplitudeSpectrum(new AmplitudeSpectrumRQ("simpleWhistle.wav", windowSize, windowSize/2));
+    }
 
+    @Test
+    @Ignore("TODO")
+    public void should_always_return_same_values(){
+        //TODO: invoke service 2/3 times and deeply check all values that are present in response table.
+    }
+
+    @Test
+    @Ignore("TODO")
+    public void both_service_versions_should_return_same_values() {
     }
 
     @Test
