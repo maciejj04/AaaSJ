@@ -37,13 +37,7 @@ public class DomainUtils {
     }
 
     public static double[] getRealAndTakeHalf(Complex[] complexes){
-        double[] real = new double[complexes.length/2];
-
-        for(int i = 0; i < complexes.length/2; i++){
-            real[i] = complexes[i + complexes.length/2].getReal();
-        }
-
-        return real;
+        return getReal(takeHalf(complexes));
     }
 
     public static double[][] splitDataByNElements(double[] data, int n){
@@ -57,14 +51,14 @@ public class DomainUtils {
         return resultArr;
     }
 
-    private Double[] getReal(Complex[] complexes){
-        Double[] real = new Double[complexes.length];
+    private static double[] getReal(Complex[] complexes){
+        double[] real = new double[complexes.length];
         for(int i = 0; i < complexes.length; i++){
             real[i] = complexes[i].getReal();
         }
         return real;
     }
-    private <T> T[] takeHalf(T[] arr){
+    private static <T> T[] takeHalf(T[] arr){
         return Arrays.copyOfRange(arr,0,arr.length/2);
     }
 

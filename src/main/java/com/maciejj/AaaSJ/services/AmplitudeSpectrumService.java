@@ -12,9 +12,8 @@ import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -30,24 +29,23 @@ import static com.maciejj.AaaSJ.domain.DomainUtils.*;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
-@RestController
+@Service("amplitureSpectrumService_v1")
 public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
     /*
         For now service will just use as many threads to process data as many processors are available on the machine.
-        There is UI to define sufficient nr of threads it should use.
-        NOTE: this may be tricky when it comes to PaaS like deployments when there might be many pods running on same physical/virtual machine.
+        Need to establish sufficient thread count. Note Amdahls law!
      */
 
+    @Value("${audio-repository-path:/var/tmp/aaasj/}")
+    private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
+
+    // TODO: convert it to local variables. In the future these should be extracted to some interceptors(?).
     private AudioFileFormat audioFileData;
     private AudioInputStream audioStream;
     private AudioFormat formatInfo;
     private int sampleSizeInBytes;
     private double[] frequencyBins;
 
-    @Value("${audio-repository-path}")
-    private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
-
-    @RequestMapping(path = "/v1/amplitudeSpectrum")
     public List<AmplitudeSpectrum> amplitudeSpectrum(@RequestBody AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
         // TODO: check if file is present in user session.
@@ -66,7 +64,7 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         ListeningExecutorService listeningExecutorService = listeningDecorator(executorService);
 
         List<ListenableFuture<AmplitudeSpectrum>> executors = new LinkedList<>();
-        FastFourierTransformer fftObject = new FastFourierTransformer(DftNormalization.STANDARD);//?
+        FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);//?
 
         BytesArrayMapper mapper = new BytesArrayMapper(sampleSizeInBytes);
 
@@ -75,21 +73,14 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
 
             executors.add(
                     listeningExecutorService.submit(() ->
-                            new AmplitudeSpectrum(Arrays.asList(getRealAndTakeHalf(Double.class, fftObject.transform(mappedBuffer, TransformType.FORWARD))))
+                            new AmplitudeSpectrum(Arrays.asList(getRealAndTakeHalf(Double.class, fft.transform(mappedBuffer, TransformType.FORWARD))))
                     )
             );
         }
 
         // TODO: currently processed audio file informations should be stored in session.
-        List<AmplitudeSpectrum> centroids = Futures.allAsList(executors).get();
+        List<AmplitudeSpectrum> spectrums = Futures.allAsList(executors).get();
         audioStream.close();
-        return centroids;
+        return spectrums;
     }
-
-    private void validateRequest(AmplitudeSpectrumRQ request) {
-        if (!isPowerOf2(request.getWindowSize())) {
-            throw new IllegalArgumentException("Not power of 2!");
-        }
-    }
-
 }

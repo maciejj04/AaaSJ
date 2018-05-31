@@ -14,7 +14,8 @@ import java.util.List;
 @Setter
 @Getter
 public class AmplitudeSpectrum {
-    List<Double> coefficients;
+
+    private List<Double> coefficients;
 
     public <T extends Number> AmplitudeSpectrum(T[] coefficients) {
         this.coefficients = (List<Double>)Arrays.asList(coefficients);

@@ -22,7 +22,7 @@ public class BytesArrayMapper {
                 supplier = () -> (double) bb.getShort(); // TODO: this is error prone! Take type as constr. parameter and cast to that type
                 break;
             default:
-                throw new UnsupportedAudioFileException();
+                throw new UnsupportedAudioFileException("Number of butes per output sample is not supported " + bytesPerOutputSample);
         }
 
         this.bytesPerOutputSample = bytesPerOutputSample;

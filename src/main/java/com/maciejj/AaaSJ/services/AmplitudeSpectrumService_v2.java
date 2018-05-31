@@ -12,6 +12,7 @@ import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,7 +32,7 @@ import static java.util.Arrays.stream;
 import static java.util.concurrent.Executors.newFixedThreadPool;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
-@RestController
+@Service("amplitureSpectrumService_v2")
 public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
 
     AudioResourceLoader audioResourceLoader;
@@ -42,12 +43,11 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
     private int sampleSizeInBytes;
     private double[] frequencyBins;
 
-    @Value("${audio-repository-path}")
+    @Value("${audio-repository-path:/var/tmp/aaasj/}")
     private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
 
-    //TODO: this is not yet working properly (test)!
-    @RequestMapping(path = "/v2/amplitudeSpectrum")
-    public List<AmplitudeSpectrum> amplitudeSpectrum(@RequestBody AmplitudeSpectrumRQ request) throws Exception {
+    //TODO: this is not yet working properly (test it)!
+    public List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
         // TODO: check if file is present in user session.
         // TODO: load file from proper S3 bucket to proper directory. Interceptor, Spring cloud AWS?
@@ -85,9 +85,4 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
         return centroids;
     }
 
-    private void validateRequest(AmplitudeSpectrumRQ request) {
-        if (!isPowerOf2(request.getWindowSize())) {
-            throw new IllegalArgumentException("Not power of 2!");
-        }
-    }
 }

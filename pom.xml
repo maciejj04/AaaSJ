@@ -62,13 +62,26 @@
 		<!--</dependency>-->
 
 
-
+		<!-- test dependencies -->
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>org.assertj</groupId>
+			<artifactId>assertj-core</artifactId>
+			<version>3.10.0</version>
+			<scope>test</scope>
+		</dependency>
+		<!--Hardly works with Spring. To be evaluated (or eventually deleted :P )-->
+		<dependency>
+			<groupId>com.tngtech.java</groupId>
+			<artifactId>junit-dataprovider</artifactId>
+			<version>1.10.0</version>
+			<scope>test</scope>
+		</dependency>
+</dependencies>
 
 	<build>
 		<plugins>
