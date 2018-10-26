@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aaasj
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aaasj
+  template:
+    metadata:
+      labels:
+        app: aaasj
+    spec:
+      containers:
+      - name: aaasj
+        image: aaasj:${APP_VERSION}
+        ports:
+        - containerPort: 8080
+
+parameters:
+- description: Application image version to be deployed.
+  name: APP_VERSION
+  required: true
