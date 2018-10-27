@@ -74,15 +74,18 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
         double[][] splittedAudioData = splitDataByNElements(fullAudioData, request.getWindowSize());
 
         stream(splittedAudioData).forEach( row -> {
-            executors.add(listeningExecutorService.submit( () ->
-                    new AmplitudeSpectrum(getRealAndTakeHalf(Double.class, fftObject.transform(row, TransformType.FORWARD)))
-            ));
+            executors.add(listeningExecutorService.submit(() -> calculateAmplitudeSpectrum(fftObject, row)));
         });
 
         // TODO: currently processed audio file informations should be stored in session.
         List<AmplitudeSpectrum> centroids = Futures.allAsList(executors).get();
         audioStream.close();
         return centroids;
+    }
+
+    private AmplitudeSpectrum calculateAmplitudeSpectrum(FastFourierTransformer fftObject, double[] row){
+        return new AmplitudeSpectrum(getRealAndTakeHalf(Double.class, fftObject.transform(row, TransformType.FORWARD)));
+
     }
 
 }

@@ -1,4 +1,7 @@
 package com.maciejj.AaaSJ.db;
 
-public class AudioFileInfoRepository {
+import com.maciejj.AaaSJ.domain.AudioFileDetails;
+import org.springframework.data.repository.CrudRepository;
+
+public abstract class AudioFileInfoRepository implements CrudRepository<AudioFileDetails, Integer> {
 }

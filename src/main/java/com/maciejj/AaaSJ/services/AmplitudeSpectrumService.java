@@ -7,10 +7,13 @@ import com.maciejj.AaaSJ.commands.AmplitudeSpectrumRQ;
 import com.maciejj.AaaSJ.domain.AmplitudeSpectrum;
 import com.maciejj.AaaSJ.domain.AudioFormatValidator;
 import com.maciejj.AaaSJ.domain.BytesArrayMapper;
+import com.maciejj.AaaSJ.domain.facades.InMemoryAudioFileFacade;
 import com.maciejj.AaaSJ.infrastructure.PerformanceResolver;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,8 +39,8 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         Need to establish sufficient thread count. Note Amdahls law!
      */
 
-    @Value("${audio-repository-path:/var/tmp/aaasj/}")
-    private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
+    Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+    InMemoryAudioFileFacade audioFacade;
 
     // TODO: convert it to local variables. In the future these should be extracted to some interceptors(?).
     private AudioFileFormat audioFileData;
@@ -46,19 +49,12 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
     private int sampleSizeInBytes;
     private double[] frequencyBins;
 
-    public List<AmplitudeSpectrum> amplitudeSpectrum(@RequestBody AmplitudeSpectrumRQ request) throws Exception {
+    public List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
-        // TODO: check if file is present in user session.
-        // TODO: load file from proper S3 bucket to proper directory. Interceptor, Spring cloud AWS?
+        audioFacade = new InMemoryAudioFileFacade(request.getFileName());
+        logger.info("Amplitude spectrum computations...");
 
-        audioStream = getAudioInputStream(new File(AUDIO_REPOSITORY_PATH + request.getFileName()));
-        formatInfo = audioStream.getFormat();
-        sampleSizeInBytes = formatInfo.getSampleSizeInBits() / 8;
-
-        AudioFormatValidator.validateAudioFormat(formatInfo);
-        frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), 4096);
-
-        byte[] buffer = generateByteBufer(4096, sampleSizeInBytes);//TODO: for now just use power of 2 request.getWindowSize()
+        //frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), 4096);
 
         ExecutorService executorService = newFixedThreadPool(PerformanceResolver.threadCountForThreadPool());
         ListeningExecutorService listeningExecutorService = listeningDecorator(executorService);
@@ -66,21 +62,21 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         List<ListenableFuture<AmplitudeSpectrum>> executors = new LinkedList<>();
         FastFourierTransformer fft = new FastFourierTransformer(DftNormalization.STANDARD);//?
 
-        BytesArrayMapper mapper = new BytesArrayMapper(sampleSizeInBytes);
 
-        while (audioStream.read(buffer) != -1) {// This is not functional style. Consider extracting new methods and changing this to rather 'stream()/pipeline' code style.
-            double[] mappedBuffer = mapper.updateData(buffer).mapToDoubleArr();
+        while (audioFacade.canRead()) {// This is not functional style. Consider extracting new methods and changing this to rather 'stream()/pipeline' code style.
+            double[] buffer = audioFacade.read();
 
             executors.add(
                     listeningExecutorService.submit(() ->
-                            new AmplitudeSpectrum(Arrays.asList(getRealAndTakeHalf(Double.class, fft.transform(mappedBuffer, TransformType.FORWARD))))
+                            new AmplitudeSpectrum(Arrays.asList(getRealAndTakeHalf(Double.class, fft.transform(buffer, TransformType.FORWARD))))
                     )
             );
         }
 
-        // TODO: currently processed audio file informations should be stored in session.
+        // TODO: currently processed audio file informations should be stored in session(?).
         List<AmplitudeSpectrum> spectrums = Futures.allAsList(executors).get();
-        audioStream.close();
+
+        logger.info("Finished amplitude spectrum computations...");
         return spectrums;
     }
 }

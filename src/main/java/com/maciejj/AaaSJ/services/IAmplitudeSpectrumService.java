@@ -8,6 +8,8 @@ import java.util.List;
 import static com.maciejj.AaaSJ.domain.DomainUtils.isPowerOf2;
 
 public interface IAmplitudeSpectrumService {
+    int defaultWindowSize = 4100;
+
     List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception;
 
     // Checks if request contains required informations to perform service.

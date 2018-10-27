@@ -1,6 +1,6 @@
 package com.maciejj.AaaSJ.commands;
 
-public class AudioFileRQ {
+public class RegisterTrackRQ {
 
     private String bucket;
     private String path;

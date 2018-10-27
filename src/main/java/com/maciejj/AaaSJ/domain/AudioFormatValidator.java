@@ -1,5 +1,6 @@
 package com.maciejj.AaaSJ.domain;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,9 +25,9 @@ public class AudioFormatValidator {
     private int allowedNrOfchanells = 1;
     private List<AudioFormat> allowedFormats = Collections.singletonList(AudioFormat.WAVE);
 
-    public static void validateAudioFormat(javax.sound.sampled.AudioFormat formatInfo) throws Exception {
+    public static void validateAudioFormat(javax.sound.sampled.AudioFormat formatInfo) throws UnsupportedAudioFileException {
         if (formatInfo.getChannels() != 1){
-            throw new Exception("Required nr of chanells = 1. Format change not yet supported.");// TODO: AWS lambda for format exchange.e.g mp3->wave
+            throw new UnsupportedAudioFileException("Required nr of chanells = 1. Format change not yet supported.");// TODO: AWS lambda for format exchange.e.g mp3->wave
         }
     }
 }

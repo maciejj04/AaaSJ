@@ -1,12 +1,22 @@
 package com.maciejj.AaaSJ.domain;
 
-import java.util.Map;
-
 public class AudioFileDetails {
 
     private int offset;
+    private AudioFileMetadata metadata;
 
-    private Map<String, String> metadata;
+    public AudioFileDetails(int offset, AudioFileMetadata metadata) {
+        this.offset = offset;
+        this.metadata = metadata;
+    }
+
+    public AudioFileMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(AudioFileMetadata metadata) {
+        this.metadata = metadata;
+    }
 
     public int getOffset() {
         return offset;
@@ -16,11 +26,4 @@ public class AudioFileDetails {
         this.offset = offset;
     }
 
-    public Map<String, String> getMetadata() {
-        return metadata;
-    }
-
-    public void setMetadata(Map<String, String> metadata) {
-        this.metadata = metadata;
-    }
 }
