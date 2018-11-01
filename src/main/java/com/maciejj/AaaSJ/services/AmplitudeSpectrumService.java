@@ -42,13 +42,6 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
     Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
     InMemoryAudioFileFacade audioFacade;
 
-    // TODO: convert it to local variables. In the future these should be extracted to some interceptors(?).
-    private AudioFileFormat audioFileData;
-    private AudioInputStream audioStream;
-    private AudioFormat formatInfo;
-    private int sampleSizeInBytes;
-    private double[] frequencyBins;
-
     public List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
         audioFacade = new InMemoryAudioFileFacade(request.getFileName());

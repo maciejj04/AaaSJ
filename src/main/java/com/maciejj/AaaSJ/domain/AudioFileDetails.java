@@ -1,29 +1,54 @@
 package com.maciejj.AaaSJ.domain;
 
+import javax.persistence.*;
+
+@Entity
 public class AudioFileDetails {
 
-    private int offset;
-    private AudioFileMetadata metadata;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int Id;
 
-    public AudioFileDetails(int offset, AudioFileMetadata metadata) {
-        this.offset = offset;
-        this.metadata = metadata;
+    @Column(name = "NAME")
+    private String name;
+
+    @Column(name = "CREATOR_ID")
+    private String creator;         // UUID ?
+
+    @Embedded
+    private BaseAudioAttributes baseAttributes;
+
+    @Embedded
+    private ComputedAudioAttributes attributes;
+
+//    private AudioFileMetadata metadata;
+
+//    public AudioFileDetails() { }
+
+    public AudioFileDetails(String name, String creator, BaseAudioAttributes baseAttributes, ComputedAudioAttributes attributes) {
+        this.name = name;
+        this.creator = creator;
+        this.baseAttributes = baseAttributes;
+        this.attributes = attributes;
     }
 
-    public AudioFileMetadata getMetadata() {
-        return metadata;
+    public BaseAudioAttributes getBaseAttributes() {
+        return baseAttributes;
     }
 
-    public void setMetadata(AudioFileMetadata metadata) {
-        this.metadata = metadata;
+    public void setBaseAttributes(BaseAudioAttributes baseAttributes) {
+        this.baseAttributes = baseAttributes;
     }
 
-    public int getOffset() {
-        return offset;
+    public String getName() {
+        return name;
     }
 
-    public void setOffset(int offset) {
-        this.offset = offset;
+    public String getCreator() {
+        return creator;
     }
 
+    public ComputedAudioAttributes getAttributes() {
+        return attributes;
+    }
 }

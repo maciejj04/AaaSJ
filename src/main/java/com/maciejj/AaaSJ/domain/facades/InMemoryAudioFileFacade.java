@@ -1,5 +1,6 @@
 package com.maciejj.AaaSJ.domain.facades;
 
+import com.maciejj.AaaSJ.domain.AudioFileMetadata;
 import com.maciejj.AaaSJ.domain.AudioFormatValidator;
 import com.maciejj.AaaSJ.domain.BytesArrayMapper;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,6 +12,7 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
 
+import static com.maciejj.AaaSJ.domain.AudioFileMetadata.*;
 import static com.maciejj.AaaSJ.domain.DomainUtils.generateByteBufer;
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
@@ -24,10 +26,8 @@ public class InMemoryAudioFileFacade {
     private AudioFileFormat audioFileData;
     private AudioFormat formatInfo;
 
-
     @Value("${audio-repository-path:/var/tmp/aaasj/}")
     private String audioRepositoryPath;       // TODO: Enhance by specific user directory path.
-
 
     public InMemoryAudioFileFacade(String name) throws IOException, UnsupportedAudioFileException {
         audioStream = getAudioInputStream(new File(audioRepositoryPath + name));
@@ -38,6 +38,11 @@ public class InMemoryAudioFileFacade {
         buffer = generateByteBufer(4096, sampleSizeInBytes);
         mapper = new BytesArrayMapper(sampleSizeInBytes);
     }
+
+//    // computes all necessary audio file info
+//    public void analyze() {
+//
+//    }
 
     public double[] read() throws IOException {
         audioStream.read(buffer);
@@ -51,4 +56,16 @@ public class InMemoryAudioFileFacade {
         }
         return true;
     }
+
+    public AudioInputStream getAudioStream() {
+        return audioStream;
+    }
+
+    public AudioFileMetadata getMetadata() {
+        return new AudioFileMetadata()
+                    .withEntry("", "");
+                    //...
+
+    }
+
 }

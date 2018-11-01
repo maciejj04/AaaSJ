@@ -14,8 +14,8 @@ public class OffsetService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-    public CompletableFuture calculateOffset(CalculateOffsetCommand offsetCmd){
-        return CompletableFuture.runAsync(() -> syncGetOffset(offsetCmd));
+    public CompletableFuture<Integer> calculateOffset(CalculateOffsetCommand offsetCmd){
+        return CompletableFuture.supplyAsync(() -> syncGetOffset(offsetCmd));
     }
 
     private Integer syncGetOffset(CalculateOffsetCommand offsetCmd) {
@@ -23,7 +23,7 @@ public class OffsetService {
             logger.info("Calculating offset...");
 
             AudioInputStream audioStream = getAudioInputStream(new File(offsetCmd.getLocalFsPath() + offsetCmd.getName()));
-            // TODO: ...
+            // TODO: use facade.
 
 
 
