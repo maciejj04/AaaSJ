@@ -3,6 +3,7 @@ package com.maciejj.AaaSJ.services;
 import com.maciejj.AaaSJ.commands.CalculateOffsetCommand;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.sound.sampled.AudioInputStream;
 import java.io.File;
@@ -10,6 +11,7 @@ import java.util.concurrent.*;
 
 import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
+@Service
 public class OffsetService {
 
     private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());

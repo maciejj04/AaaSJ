@@ -7,6 +7,7 @@ import com.maciejj.AaaSJ.domain.ComputedAudioAttributes;
 import com.maciejj.AaaSJ.domain.AudioFileDetails;
 import com.maciejj.AaaSJ.domain.AudioFileMetadata;
 import com.maciejj.AaaSJ.domain.BaseAudioAttributes;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,7 +20,11 @@ public class TrackRegistrationService {
     private IAmplitudeSpectrumService amplitudeSpectrumService;
     private AudioFileInfoRepository repository;
 
-    public TrackRegistrationService(OffsetService offsetService, IAmplitudeSpectrumService amplitudeSpectrumService, AudioFileInfoRepository repository) {
+    public TrackRegistrationService(
+            OffsetService offsetService,
+            @Qualifier("amplitureSpectrumService_v1") IAmplitudeSpectrumService amplitudeSpectrumService,
+            AudioFileInfoRepository repository) {
+
         this.offsetService = offsetService;
         this.amplitudeSpectrumService = amplitudeSpectrumService;
         this.repository = repository;
@@ -36,7 +41,7 @@ public class TrackRegistrationService {
 
     private AudioFileMetadata getMetadata(){
         // duration etc.
-        return new AudioFileMetadata().withEntry("duration", "1:23");
+        return new AudioFileMetadata();
     }
 
     private BaseAudioAttributes getBaseAudioAttributes() {

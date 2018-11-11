@@ -4,16 +4,14 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.maciejj.AaaSJ.infrastructure.TimerProxy;
-import com.maciejj.AaaSJ.services.AmplitudeSpectrumService;
-import com.maciejj.AaaSJ.services.AmplitudeSpectrumService_v2;
-import com.maciejj.AaaSJ.services.IAmplitudeSpectrumService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +23,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @RestController
 @Configuration
 @ComponentScan
+@EnableJpaRepositories("com.maciejj.AaaSJ.db")
+@EntityScan("com.maciejj.AaaSJ.domain")
 public class AaaSjApplication implements WebMvcConfigurer {
 
 	// Allow CORS for all. For AWS deployment.

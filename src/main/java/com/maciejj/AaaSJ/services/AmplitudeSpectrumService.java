@@ -5,32 +5,24 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.maciejj.AaaSJ.commands.AmplitudeSpectrumRQ;
 import com.maciejj.AaaSJ.domain.AmplitudeSpectrum;
-import com.maciejj.AaaSJ.domain.AudioFormatValidator;
-import com.maciejj.AaaSJ.domain.BytesArrayMapper;
 import com.maciejj.AaaSJ.domain.facades.InMemoryAudioFileFacade;
+import com.maciejj.AaaSJ.domain.facades.InMemoryAudioFileFacadeFactory;
 import com.maciejj.AaaSJ.infrastructure.PerformanceResolver;
 import org.apache.commons.math3.transform.DftNormalization;
 import org.apache.commons.math3.transform.FastFourierTransformer;
 import org.apache.commons.math3.transform.TransformType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import java.io.File;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static com.google.common.util.concurrent.MoreExecutors.listeningDecorator;
-import static com.maciejj.AaaSJ.domain.DomainUtils.*;
+import static com.maciejj.AaaSJ.domain.DomainUtils.getRealAndTakeHalf;
 import static java.util.concurrent.Executors.newFixedThreadPool;
-import static javax.sound.sampled.AudioSystem.getAudioInputStream;
 
 @Service("amplitureSpectrumService_v1")
 public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
@@ -39,13 +31,20 @@ public class AmplitudeSpectrumService implements IAmplitudeSpectrumService {
         Need to establish sufficient thread count. Note Amdahls law!
      */
 
-    Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
-    InMemoryAudioFileFacade audioFacade;
+    private Logger logger = LoggerFactory.getLogger(this.getClass().getSimpleName());
+
+    private InMemoryAudioFileFacadeFactory audioFacadeFactory;
+
+    public AmplitudeSpectrumService(InMemoryAudioFileFacadeFactory audioFacadeFactory) {
+        this.audioFacadeFactory = audioFacadeFactory;
+    }
+
 
     public List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
-        audioFacade = new InMemoryAudioFileFacade(request.getFileName());
         logger.info("Amplitude spectrum computations...");
+
+        InMemoryAudioFileFacade audioFacade = audioFacadeFactory.getOne(request.getFileName());
 
         //frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), 4096);
 

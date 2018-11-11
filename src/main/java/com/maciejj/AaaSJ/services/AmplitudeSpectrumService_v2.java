@@ -43,21 +43,22 @@ public class AmplitudeSpectrumService_v2 implements IAmplitudeSpectrumService {
     private int sampleSizeInBytes;
     private double[] frequencyBins;
 
+    @Value("${fft.size:4096}")
+    private int fftSize;
+
     @Value("${audio-repository-path:/var/tmp/aaasj/}")
     private String AUDIO_REPOSITORY_PATH;       // TODO: Enhance by specific user directory path.
 
     //TODO: this is not yet working properly (test it)!
     public List<AmplitudeSpectrum> amplitudeSpectrum(AmplitudeSpectrumRQ request) throws Exception {
         validateRequest(request);
-        // TODO: check if file is present in user session.
-        // TODO: load file from proper S3 bucket to proper directory. Interceptor, Spring cloud AWS?
 
         audioStream = getAudioInputStream(new File(AUDIO_REPOSITORY_PATH + request.getFileName()));
         formatInfo = audioStream.getFormat();
         sampleSizeInBytes = formatInfo.getSampleSizeInBits() / 8;
 
         AudioFormatValidator.validateAudioFormat(formatInfo);
-        frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), 4096);
+        frequencyBins = generateFrequencyBins((int) this.formatInfo.getFrameRate(), fftSize);
 
         byte[] fullBuffer = generateByteBufer((int) formatInfo.getSampleRate(), sampleSizeInBytes);
 
